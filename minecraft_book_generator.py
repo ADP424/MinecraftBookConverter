@@ -1,0 +1,170 @@
+"""
+Takes a text file and generates a Minecraft command to give a written book with
+that text parsed into it
+
+ASSUMPTIONS ABOUT INPUT TEXT:
+- Made up of exclusively ASCII characters 32-126
+- No individual word is longer than a whole page
+"""
+
+# every page has a width of 114 pixels
+BOOK_WIDTH = 114
+
+# every page has a height of 14 lines
+BOOK_HEIGHT = 14
+
+# dictionary of character pixel widths for ASCII characters 32-126
+pixel_widths = {
+    ' ': 3,
+    '!': 1,
+    '"': 3,
+    '#': 5,
+    '$': 5,
+    '%': 5,
+    '&': 5,
+    '\'': 1,
+    '(': 3,
+    ')': 3,
+    '*': 3,
+    '+': 5,
+    ',': 1,
+    '-': 5,
+    '.': 1,
+    '/': 5,
+    '0': 5,
+    '1': 5,
+    '2': 5,
+    '3': 5,
+    '4': 5,
+    '5': 5,
+    '6': 5,
+    '7': 5,
+    '8': 5,
+    '9': 5,
+    ':': 1,
+    ';': 1,
+    '<': 4,
+    '=': 5,
+    '>': 4,
+    '?': 5,
+    '@': 6,
+    'A': 5,
+    'B': 5,
+    'C': 5,
+    'D': 5,
+    'E': 5,
+    'F': 5,
+    'G': 5,
+    'H': 5,
+    'I': 3,
+    'J': 5,
+    'K': 5,
+    'L': 5,
+    'M': 5,
+    'N': 5,
+    'O': 5,
+    'P': 5,
+    'Q': 5,
+    'R': 5,
+    'S': 5,
+    'T': 5,
+    'U': 5,
+    'V': 5,
+    'W': 5,
+    'X': 5,
+    'Y': 5,
+    'Z': 5,
+    '[': 3,
+    '\\': 5,
+    ']': 3,
+    '^': 5,
+    '_': 5,
+    '`': 2,
+    'a': 5,
+    'b': 5,
+    'c': 5,
+    'd': 5,
+    'e': 5,
+    'f': 4,
+    'g': 5,
+    'h': 5,
+    'i': 1,
+    'j': 5,
+    'k': 4,
+    'l': 2,
+    'm': 5,
+    'n': 5,
+    'o': 5,
+    'p': 5,
+    'q': 5,
+    'r': 5,
+    's': 5,
+    't': 3,
+    'u': 5,
+    'v': 5,
+    'w': 5,
+    'x': 5,
+    'y': 5,
+    'z': 5,
+    '{': 3,
+    '|': 1,
+    '}': 3,
+    '~': 6,
+}
+
+words = []
+filename = input("What is the full name of the file containing your text?: ")
+with open(filename, 'r') as file:
+    # replace tabs and newlines with spaces
+    words = file.read().replace('\t', ' ').replace('\n', ' ').split(' ')
+
+title = input("What is the title of the book?: ").replace('\"', '\\\"').strip()
+if len(title) == 0:
+    title == "\"\""
+
+author = input("What is the author of the book?: ").replace('\"', '\\\"').strip()
+if len(author) == 0:
+    author == "\"\""
+
+lore = input("What is the description of the book?: ").replace('\"', '\\\"').strip()
+
+command = "/give @p written_book{pages:['{\"text\":\""
+
+curr_line = 1
+curr_num_pixels = 0
+i = 0
+while i < len(words):
+    for character in words[i]:
+        curr_num_pixels += pixel_widths[character] + 1 # there is 1 pixel spacing between every character
+        # if the character is a quote or apostrophe, escape it for command formatting
+        if character == '\"':
+            command += "\\\""
+        elif character == '\'':
+            command += "\\\'"
+        else:   
+            command += character
+
+    if curr_num_pixels >= BOOK_WIDTH:
+        # skip lines until the number of pixels is less than the max book width
+        potential_num_pixels = curr_num_pixels
+        while potential_num_pixels > BOOK_WIDTH:
+            potential_num_pixels -= BOOK_WIDTH
+            curr_line += 1
+        # if the word pushes the book to the next page, don't add the next word, don't
+        # increment to the next word, and don't reset the number of pixels
+        if curr_line > BOOK_HEIGHT:
+            curr_line = 1
+            command += "\"}','{\"text\":\""
+            continue
+        curr_num_pixels = potential_num_pixels
+
+    # add a space at the end of each word if the word isn't the last on the line
+    curr_num_pixels += pixel_widths[' '] + 1
+    command += ' '
+    i += 1
+
+command += "\"}'],title:" + title + ",author:" + author + ",display:{Lore:[\"" + lore + "\"]}}"
+
+with open('output.txt', 'w') as file:
+    file.write(command)
+    print(command)
