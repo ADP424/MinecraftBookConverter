@@ -146,8 +146,6 @@ while i < len(words):
             command += character
     curr_num_pixels += curr_word_num_pixels
 
-    print(curr_num_pixels, end=" | ")
-
     if curr_num_pixels > BOOK_WIDTH:
         print()
         # skip lines until the number of pixels is less than the max book width
@@ -161,11 +159,13 @@ while i < len(words):
         if curr_line > BOOK_HEIGHT:
             curr_line = 1
             command += "\"}','{\"text\":\""
+            continue
         curr_num_pixels = potential_num_pixels
 
     # add a space at the end of each word if the word isn't the last on the line
     curr_num_pixels += pixel_widths[' '] + 1
     command += ' '
+    print(words[i], end=" ")
     i += 1
 
 command += "\"}'],title:" + title + ",author:" + author + ",display:{Lore:[\"" + lore + "\"]}}"
