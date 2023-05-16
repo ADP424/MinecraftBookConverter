@@ -1,15 +1,13 @@
 """
-Takes a text file and generates Minecraft commands to give written books with
-that text parsed into it. If a body of text is too long to fit inside a single book,
-multiple commands are generated to give multiple books.
+Takes a text file and generates a Minecraft function file to be placed inside a
+datapack folder. This bypasses the 32,500 character limit inside command blocks
+and allows the generation of any (reasonable) length book. The output file can
+be placed inside the 'functions' folder of any data pack.
 
 ASSUMPTIONS ABOUT INPUT TEXT:
 - Made up of exclusively ASCII characters 32-126
 - No individual word is longer than a whole page
 """
-
-# every book has a max of 100 pages
-PAGE_LIMIT = 100
 
 # every page has a width of 114 pixels
 BOOK_WIDTH = 114
@@ -118,7 +116,7 @@ PIXEL_WIDTHS = {
 }
 
 # clear the output file
-with open('output.txt', 'w') as file:
+with open('makebook.mcfunction', 'w') as file:
     file.write("")
 
 words = []
@@ -133,7 +131,7 @@ author = input("What is the author of the book?: ").replace('\"', '\\\"').strip(
 
 lore = input("What is the description of the book?: ").replace('\"', '\\\"').strip()
 
-command = "/give @p written_book{pages:['{\"text\":\""
+command = "give @p written_book{pages:['{\"text\":\""
 
 curr_book = 1 # what number book the program is on
 curr_page = 1 # what number page of the current book the program is on
@@ -188,27 +186,8 @@ while i < len(words):
         # if the word pushes the book to the next page, don't add the next word, don't
         # increment to the next word, and don't reset the number of pixels
         if curr_line > BOOK_HEIGHT:
-
-            # if the page limit has been reached, end this command, write it to the file, and start a new one
-            if curr_page >= PAGE_LIMIT:
-
-                # if this book is not the first, append its number to the end of the title
-                if curr_book >= 2:
-                    command += "\"}'],title:\"" + title + " " + str(curr_book) + "\",author:\"" + author + "\",display:{Lore:[\"" + lore + "\"]}}"
-                else:
-                    command += "\"}'],title:\"" + title + "\",author:\"" + author + "\",display:{Lore:[\"" + lore + "\"]}}"
-
-                with open('output.txt', 'a') as file:
-                    file.write(command)
-                    file.write("\n\n")
-                command = "/give @p written_book{pages:['{\"text\":\""
-                curr_page = 1
-                curr_book += 1
-
-            # if the page limit hasn't been met, start a new page
-            else:
-                command += "\"}','{\"text\":\""
-                curr_page += 1
+            command += "\"}','{\"text\":\""
+            curr_page += 1
             curr_line = 1
             curr_num_pixels = 0
             continue
@@ -228,5 +207,5 @@ while i < len(words):
 
 # end the current command and write it to the file
 command += "\"}'],title:\"" + title + "\",author:\"" + author + "\",display:{Lore:[\"" + lore + "\"]}}"
-with open('output.txt', 'a') as file:
+with open('makebook.mcfunction', 'a') as file:
     file.write(command)
