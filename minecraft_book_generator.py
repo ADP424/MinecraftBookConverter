@@ -151,14 +151,25 @@ while i < len(words):
         continue
 
     curr_num_pixels += curr_word_num_pixels
-    print(new_word, end=" | ")
 
     if curr_num_pixels > BOOK_WIDTH:
-        print()
         # remove the space from the end of the last word, since this is the end of the line
         command.rstrip(command[-1])
+
+        # increment the current line and set the number of pixels to start that line equal to its length
         curr_line += 1
         potential_num_pixels = curr_word_num_pixels
+
+        # in the case that the word is longer than an entire line, continue incrementing lines for its whole length
+        curr_num_pixels_in_word = 0
+        for character in new_word:
+            curr_num_pixels_in_word += pixel_widths[character] + 1
+            if curr_num_pixels_in_word > BOOK_WIDTH:
+                curr_line += 1
+                potential_num_pixels -= (curr_num_pixels_in_word - pixel_widths[character] - 1)
+                curr_num_pixels_in_word = pixel_widths[character] + 1
+        print(words[i] + " ///", curr_line, potential_num_pixels)
+
         # if the word pushes the book to the next page, don't add the next word, don't
         # increment to the next word, and don't reset the number of pixels
         if curr_line > BOOK_HEIGHT:
@@ -179,9 +190,3 @@ command += "\"}'],title:" + title + ",author:" + author + ",display:{Lore:[\"" +
 with open('output.txt', 'w') as file:
     file.write(command)
     print(command)
-
-testers = "church, and his family."
-count = 0
-for character in testers:
-    count += pixel_widths[character] + 1
-print(count)
