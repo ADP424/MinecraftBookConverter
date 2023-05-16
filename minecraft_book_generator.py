@@ -120,11 +120,11 @@ with open(filename, 'r') as file:
 
 title = input("What is the title of the book?: ").replace('\"', '\\\"').strip()
 if len(title) == 0:
-    title == "\"\""
+    title = "\"\""
 
 author = input("What is the author of the book?: ").replace('\"', '\\\"').strip()
 if len(author) == 0:
-    author == "\"\""
+    author = "\"\""
 
 lore = input("What is the description of the book?: ").replace('\"', '\\\"').strip()
 
@@ -134,8 +134,9 @@ curr_line = 1
 curr_num_pixels = 0
 i = 0
 while i < len(words):
+    curr_word_num_pixels = 0
     for character in words[i]:
-        curr_num_pixels += pixel_widths[character] + 1 # there is 1 pixel spacing between every character
+        curr_word_num_pixels += pixel_widths[character] + 1 # there is 1 pixel spacing between every character
         # if the character is a quote or apostrophe, escape it for command formatting
         if character == '\"':
             command += "\\\""
@@ -143,19 +144,23 @@ while i < len(words):
             command += "\\\'"
         else:   
             command += character
+    curr_num_pixels += curr_word_num_pixels
 
-    if curr_num_pixels >= BOOK_WIDTH:
+    print(curr_num_pixels, end=" | ")
+
+    if curr_num_pixels > BOOK_WIDTH:
+        print()
         # skip lines until the number of pixels is less than the max book width
         potential_num_pixels = curr_num_pixels
         while potential_num_pixels > BOOK_WIDTH:
             potential_num_pixels -= BOOK_WIDTH
             curr_line += 1
+        potential_num_pixels = curr_word_num_pixels
         # if the word pushes the book to the next page, don't add the next word, don't
         # increment to the next word, and don't reset the number of pixels
         if curr_line > BOOK_HEIGHT:
             curr_line = 1
             command += "\"}','{\"text\":\""
-            continue
         curr_num_pixels = potential_num_pixels
 
     # add a space at the end of each word if the word isn't the last on the line
