@@ -1,11 +1,15 @@
 """
-Takes a text file and generates a Minecraft command to give a written book with
-that text parsed into it
+Takes a text file and generates Minecraft commands to give written books with
+that text parsed into it. If a body of text is too long to fit inside a single book,
+multiple commands are generated to give multiple books.
 
 ASSUMPTIONS ABOUT INPUT TEXT:
 - Made up of exclusively ASCII characters 32-126
 - No individual word is longer than a whole page
 """
+
+# every book has a max of 100 pages
+PAGE_LIMIT = 100
 
 # every page has a width of 114 pixels
 BOOK_WIDTH = 114
@@ -14,7 +18,7 @@ BOOK_WIDTH = 114
 BOOK_HEIGHT = 14
 
 # dictionary of character pixel widths for ASCII characters 32-126
-pixel_widths = {
+PIXEL_WIDTHS = {
     ' ': 3,
     '!': 1,
     '"': 3,
@@ -112,6 +116,10 @@ pixel_widths = {
     '~': 6,
 }
 
+# clear the output file
+with open('output.txt', 'w') as file:
+    file.write("")
+
 words = []
 filename = input("What is the full name of the file containing your text?: ")
 with open(filename, 'r') as file:
@@ -119,28 +127,27 @@ with open(filename, 'r') as file:
     words = file.read().replace('\t', ' ').replace('\n', ' ').split(' ')
 
 title = input("What is the title of the book?: ").replace('\"', '\\\"').strip()
-if len(title) == 0:
-    title = "\"\""
 
 author = input("What is the author of the book?: ").replace('\"', '\\\"').strip()
-if len(author) == 0:
-    author = "\"\""
 
 lore = input("What is the description of the book?: ").replace('\"', '\\\"').strip()
 
 command = "/give @p written_book{pages:['{\"text\":\""
 
-curr_line = 1
-curr_num_pixels = 0
+curr_book = 1 # what number book the program is on
+curr_page = 1 # what number page of the current book the program is on
+curr_line = 1 # what number line of the current page the program is on
+curr_num_pixels = 0 # how many pixels on the current line the program is on
+
 i = 0
 while i < len(words):
     curr_word_num_pixels = 0
     new_word = ""
     for character in words[i].strip():
-        curr_word_num_pixels += pixel_widths[character] + 1 # there is 1 pixel spacing between every character
+        curr_word_num_pixels += PIXEL_WIDTHS[character] + 1 # there is 1 pixel spacing between every character
         # if the character is a quote or apostrophe, escape it for command formatting
         if character == '\"':
-            new_word += "\\\""
+            new_word += "\\\\\""
         elif character == '\'':
             new_word += "\\\'"
         else:   
@@ -163,30 +170,45 @@ while i < len(words):
         # in the case that the word is longer than an entire line, continue incrementing lines for its whole length
         curr_num_pixels_in_word = 0
         for character in new_word:
-            curr_num_pixels_in_word += pixel_widths[character] + 1
+            curr_num_pixels_in_word += PIXEL_WIDTHS[character] + 1
             if curr_num_pixels_in_word > BOOK_WIDTH:
                 curr_line += 1
-                potential_num_pixels -= (curr_num_pixels_in_word - pixel_widths[character] - 1)
-                curr_num_pixels_in_word = pixel_widths[character] + 1
-        print(words[i] + " ///", curr_line, potential_num_pixels)
+                potential_num_pixels -= (curr_num_pixels_in_word - PIXEL_WIDTHS[character] - 1)
+                curr_num_pixels_in_word = PIXEL_WIDTHS[character] + 1
 
         # if the word pushes the book to the next page, don't add the next word, don't
         # increment to the next word, and don't reset the number of pixels
         if curr_line > BOOK_HEIGHT:
+            # if the page limit has been reached, end this command, write it to the file, and start a new one
+            if curr_page >= PAGE_LIMIT:
+                # if this book is not the first, append its number to the end of the title
+                if curr_book >= 2:
+                    command += "\"}'],title:\"" + title + " " + str(curr_book) + "\",author:\"" + author + "\",display:{Lore:[\"" + lore + "\"]}}"
+                else:
+                    command += "\"}'],title:\"" + title + "\",author:\"" + author + "\",display:{Lore:[\"" + lore + "\"]}}"
+
+                with open('output.txt', 'a') as file:
+                    file.write(command)
+                    file.write("\n\n")
+                command = "/give @p written_book{pages:['{\"text\":\""
+                curr_page = 1
+                curr_book += 1
+            # if the page limit hasn't been met, start a new page
+            else:
+                command += "\"}','{\"text\":\""
+                curr_page += 1
             curr_line = 1
-            command += "\"}','{\"text\":\""
             curr_num_pixels = 0
             continue
         curr_num_pixels = potential_num_pixels
     
     # add a space at the end of the word
     new_word += ' '
-    curr_num_pixels += pixel_widths[' '] + 1
+    curr_num_pixels += PIXEL_WIDTHS[' '] + 1
     command += new_word
     i += 1
 
-command += "\"}'],title:" + title + ",author:" + author + ",display:{Lore:[\"" + lore + "\"]}}"
-
-with open('output.txt', 'w') as file:
+# end the current command and write it to the file
+command += "\"}'],title:\"" + title + "\",author:\"" + author + "\",display:{Lore:[\"" + lore + "\"]}}"
+with open('output.txt', 'a') as file:
     file.write(command)
-    print(command)
