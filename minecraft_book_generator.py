@@ -135,37 +135,43 @@ curr_num_pixels = 0
 i = 0
 while i < len(words):
     curr_word_num_pixels = 0
-    for character in words[i]:
+    new_word = ""
+    for character in words[i].strip():
         curr_word_num_pixels += pixel_widths[character] + 1 # there is 1 pixel spacing between every character
         # if the character is a quote or apostrophe, escape it for command formatting
         if character == '\"':
-            command += "\\\""
+            new_word += "\\\""
         elif character == '\'':
-            command += "\\\'"
+            new_word += "\\\'"
         else:   
-            command += character
+            new_word += character
+    # if the word was just made up of spaces, skip
+    if len(new_word) == 0:
+        i += 1
+        continue
+
     curr_num_pixels += curr_word_num_pixels
+    print(new_word, end=" | ")
 
     if curr_num_pixels > BOOK_WIDTH:
         print()
-        # skip lines until the number of pixels is less than the max book width
-        potential_num_pixels = curr_num_pixels
-        while potential_num_pixels > BOOK_WIDTH:
-            potential_num_pixels -= BOOK_WIDTH
-            curr_line += 1
+        # remove the space from the end of the last word, since this is the end of the line
+        command.rstrip(command[-1])
+        curr_line += 1
         potential_num_pixels = curr_word_num_pixels
         # if the word pushes the book to the next page, don't add the next word, don't
         # increment to the next word, and don't reset the number of pixels
         if curr_line > BOOK_HEIGHT:
             curr_line = 1
             command += "\"}','{\"text\":\""
+            curr_num_pixels = 0
             continue
         curr_num_pixels = potential_num_pixels
-
-    # add a space at the end of each word if the word isn't the last on the line
+    
+    # add a space at the end of the word
+    new_word += ' '
     curr_num_pixels += pixel_widths[' '] + 1
-    command += ' '
-    print(words[i], end=" ")
+    command += new_word
     i += 1
 
 command += "\"}'],title:" + title + ",author:" + author + ",display:{Lore:[\"" + lore + "\"]}}"
@@ -173,3 +179,9 @@ command += "\"}'],title:" + title + ",author:" + author + ",display:{Lore:[\"" +
 with open('output.txt', 'w') as file:
     file.write(command)
     print(command)
+
+testers = "church, and his family."
+count = 0
+for character in testers:
+    count += pixel_widths[character] + 1
+print(count)
