@@ -7,7 +7,7 @@ The output file can be placed inside the 'functions' folder of any data pack, or
 it can be pasted right into a command block if it is fewer than 32,500 characters.
 
 ASSUMPTIONS ABOUT INPUT TEXT:
-- Made up of exclusively ASCII characters 32-126
+- Made up of standard unicode characters
 """
 
 # every page has a width of 114 pixels
@@ -18,6 +18,11 @@ BOOK_HEIGHT = 14
 
 # dictionary of character pixel widths for ASCII characters 32-126
 PIXEL_WIDTHS = {
+    # formatting characters
+    '\n': 0,
+    '§': 0,
+
+    # basic latin
     ' ': 3,
     '!': 1,
     '"': 3,
@@ -113,7 +118,139 @@ PIXEL_WIDTHS = {
     '|': 1,
     '}': 3,
     '~': 6,
-    '\n': 0
+
+    # latin-1 supplement
+    ' ': 3,
+    '¡': 1,
+    '¢': 5,
+    '£': 5,
+    '¤': 7,
+    '¥': 5,
+    '¦': 1,
+    '¨': 3,
+    '©': 7,
+    'ª': 4,
+    '«': 6,
+    '¬': 5,
+    '­': 3,
+    '®': 7,
+    '¯': 5,
+    '°': 4,
+    '±': 5,
+    '²': 4,
+    '³': 4,
+    '´': 2,
+    'µ': 5,
+    '¶': 6,
+    '·': 1,
+    '¸': 1,
+    '¹': 3,
+    'º': 4,
+    '»': 6,
+    '¼': 7,
+    '½': 7,
+    '¾': 7,
+    '¿': 5,
+    'À': 5,
+    'Á': 5,
+    'Â': 5,
+    'Ã': 5,
+    'Ä': 5,
+    'Å': 5,
+    'Æ': 9,
+    'Ç': 5,
+    'È': 5,
+    'É': 5,
+    'Ê': 5,
+    'Ë': 5,
+    'Ì': 3,
+    'Í': 3,
+    'Î': 3,
+    'Ï': 3,
+    'Ð': 6,
+    'Ñ': 5,
+    'Ò': 5,
+    'Ó': 5,
+    'Ô': 5,
+    'Õ': 5,
+    'Ö': 5,
+    '×': 5,
+    'Ù': 5,
+    'Ú': 5,
+    'Û': 5,
+    'Ü': 5,
+    'Ý': 5,
+    'Þ': 5,
+    'ß': 5,
+    'à': 5,
+    'á': 5,
+    'â': 5,
+    'ã': 5,
+    'ä': 5,
+    'å': 5,
+    'æ': 9,
+    'ç': 5,
+    'è': 5,
+    'é': 5,
+    'ê': 5,
+    'ë': 5,
+    'ì': 2,
+    'í': 2,
+    'î': 3,
+    'ï': 3,
+    'ð': 5,
+    'ñ': 5,
+    'ò': 5,
+    'ó': 5,
+    'ô': 5,
+    'õ': 5,
+    'ö': 5,
+    '÷': 5,
+    'Ø': 5,
+    'ù': 5,
+    'ú': 5,
+    'û': 5,
+    'ü': 5,
+    'ý': 5,
+    'þ': 5,
+    'ÿ': 5,
+
+    # others I haven't categorized yet
+    '┐': 5,
+    '€': 6,
+    '“': 4,
+    '”': 4,
+    '‘': 2,
+    '’': 2,
+    '„': 4,
+    '‚': 2,
+    '‹': 3,
+    '›': 3,
+    'Ƒ': 6,
+    '•': 2,
+    '–': 6,
+    '˜': 3,
+    '™': 8,
+    'š': 5,
+    'œ': 9,
+    'ÿ': 5,
+    'ž': 5,
+    'Æ': 9,
+    'æ': 9,
+    '░': 7,
+    '▒': 8,
+    '▓': 8,
+    '│': 5,
+    '┫': 2,
+    '─': 8,
+    '┌': 8,
+    '┘': 5,
+    '└': 8,
+    'π': 5,
+    '√': 6,
+    '∑': 5,
+    '∞': 7,
+    '≡': 6,
 }
 
 # clear the output file
@@ -142,12 +279,17 @@ curr_num_pixels = 0 # how many pixels on the current line the program is on
 i = 0
 last_word_ended_with_newline = False
 while i < len(words):
+    last_char_was_section_sign = False
     curr_word_num_pixels = 0
     new_word = ""
     for character in words[i]:
-        curr_word_num_pixels += PIXEL_WIDTHS[character] + 1 # there is 1 pixel spacing between every character
+        # if the character was a §, skip counting the next character's pixels, since that is used for Minecraft formatting
+        if not last_char_was_section_sign:
+            curr_word_num_pixels += PIXEL_WIDTHS[character] + 1 # there is 1 pixel spacing between every character
+        else:
+            last_char_was_section_sign = False
 
-        # if the character is a slash, quote, apostrophe, or newline, escape it for command formatting
+        # if the character is a \, ", ', or \n, escape it for command formatting
         if character == "\\":
             new_word += "\\\\"
         elif character == '\"':
@@ -156,6 +298,8 @@ while i < len(words):
             new_word += "\\\'"
         elif character == '\n':
             new_word += "\\\\n"
+        elif character == '§':
+            last_char_was_section_sign = True
         else:   
             new_word += character
 
