@@ -171,9 +171,6 @@ while i < len(words):
     if curr_num_pixels > BOOK_WIDTH or last_word_ended_with_newline:
         last_word_ended_with_newline = False # reset this
 
-        # remove the space from the end of the last word, since this is the end of the line
-        command.rstrip(command[-1])
-
         # increment the current line and set the number of pixels at the start of that line equal to its length
         curr_line += 1
         potential_num_pixels = curr_word_num_pixels

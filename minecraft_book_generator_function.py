@@ -121,7 +121,7 @@ with open('makebook.mcfunction', 'w') as file:
 
 words = []
 filename = input("What is the full name of the file containing your text?: ")
-with open(filename, 'r') as file:
+with open(filename, 'r', encoding='utf-8') as file:
     # replace tabs with spaces and add a space after every newline, then split by spaces
     words = file.read().replace('\t', ' ').replace('\n', '\n ').split(' ')
 
@@ -146,8 +146,10 @@ while i < len(words):
     for character in words[i]:
         curr_word_num_pixels += PIXEL_WIDTHS[character] + 1 # there is 1 pixel spacing between every character
 
-        # if the character is a quote, apostrophe, or newline, escape it for command formatting
-        if character == '\"':
+        # if the character is a slash, quote, apostrophe, or newline, escape it for command formatting
+        if character == "\\":
+            new_word += "\\\\"
+        elif character == '\"':
             new_word += "\\\\\""
         elif character == '\'':
             new_word += "\\\'"
@@ -167,21 +169,41 @@ while i < len(words):
     if curr_num_pixels > BOOK_WIDTH or last_word_ended_with_newline:
         last_word_ended_with_newline = False # reset this
 
-        # remove the space from the end of the last word, since this is the end of the line
-        command.rstrip(command[-1])
-
         # increment the current line and set the number of pixels at the start of that line equal to its length
         curr_line += 1
         potential_num_pixels = curr_word_num_pixels
 
+        num_escape_characters = 0 # keep track of the number of characters that need escaping with the backslash in the word
         # in the case that the word is longer than an entire line, continue incrementing lines for its whole length
-        curr_num_pixels_in_word = 0
-        for character in new_word:
-            curr_num_pixels_in_word += PIXEL_WIDTHS[character] + 1
-            if curr_num_pixels_in_word > BOOK_WIDTH:
-                curr_line += 1
-                potential_num_pixels -= (curr_num_pixels_in_word - PIXEL_WIDTHS[character] - 1)
-                curr_num_pixels_in_word = PIXEL_WIDTHS[character] + 1
+        if curr_word_num_pixels > BOOK_WIDTH:
+            curr_num_pixels_in_word = 0
+            j = 0
+            while j < len(words[i]):
+                if words[i][j] == '\\' or words[i][j] == '\"' or words[i][j] == '\'':
+                    num_escape_characters += 1
+
+                curr_num_pixels_in_word += PIXEL_WIDTHS[words[i][j]] + 1
+                if curr_num_pixels_in_word > BOOK_WIDTH:
+                    curr_line += 1
+                    potential_num_pixels -= (curr_num_pixels_in_word - PIXEL_WIDTHS[words[i][j]] - 1)
+                    curr_num_pixels_in_word = PIXEL_WIDTHS[words[i][j]] + 1
+
+                # if the word goes over to the next page, break to save processing time
+                if curr_line > BOOK_HEIGHT:
+                    break
+
+                j += 1
+
+                # if this word takes up more than the rest of the page, write as much of it as will fit, and take that bit off
+            if curr_line > BOOK_HEIGHT:
+                # new_word is num_escape_characters longer than words[i] up until j
+                command += new_word[:j + num_escape_characters] # don't include the current character, since that pushed the word onto the next page
+                command += "\"}','{\"text\":\""
+                words[i] = words[i][j:]
+                curr_page += 1
+                curr_line = 1
+                curr_num_pixels = 0
+                continue
 
         # if the word pushes the book to the next page, don't add the next word, don't
         # increment to the next word, and don't reset the number of pixels
