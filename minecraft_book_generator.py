@@ -41,15 +41,10 @@ curr_num_pixels = 0 # how many pixels on the current line the program is on
 i = 0
 last_word_ended_with_newline = False
 while i < len(words):
-    last_char_was_section_sign = False
     curr_word_num_pixels = 0
     new_word = ""
     for character in words[i]:
-        # if the character was a §, skip counting the next character's pixels, since that is used for Minecraft formatting
-        if not last_char_was_section_sign:
-            curr_word_num_pixels += PIXEL_WIDTHS[character] + 1 # there is 1 pixel spacing between every character
-        else:
-            last_char_was_section_sign = False
+        curr_word_num_pixels += PIXEL_WIDTHS[character] + 1 # there is 1 pixel spacing between every character
 
         # if the character is a \, ", ', or \n, escape it for command formatting
         if character == "\\":
@@ -60,9 +55,7 @@ while i < len(words):
             new_word += "\\\'"
         elif character == '\n':
             new_word += "\\\\n"
-        elif character == '§':
-            last_char_was_section_sign = True
-        else:   
+        else:
             new_word += character
 
     # if the word was just made up of spaces, skip
