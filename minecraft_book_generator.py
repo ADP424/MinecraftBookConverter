@@ -45,12 +45,15 @@ while i < len(words):
     new_word = ""
     for character in words[i]:
         # if a character isn't in the dictionary, assume a pixel spacing of 9 (the max potential spacing of a character)
+        # if the default is used, print that the character wasn't recognized
         # + 1 because there is a 1 character spacing between characters (with a few but handleable exceptions)
         curr_word_num_pixels += PIXEL_WIDTHS.get(character, 9) + 1
+        if character not in PIXEL_WIDTHS:
+            print("Character currently unrecognized: " + character + ". Using default pixel width 9.")
 
         # if the character is a \, ", ', or \n, escape it for command formatting
         if character == "\\":
-            new_word += "\\\\"
+            new_word += "\\\\\\\\"
         elif character == '\"':
             new_word += "\\\\\""
         elif character == '\'':
