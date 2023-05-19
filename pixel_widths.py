@@ -1,7 +1,9 @@
 """
 Defines a dictionary of character pixel widths for ever Unicode character
 An entry with an asterisk (*) next to it is not recognized by Minecraft and appears as a 
-5 pixel wide box
+5 pixel wide box. Characters with -1 pixel spacing listed don't appear or take up space in
+Minecraft text. Characters with a 0 pixel spacing listed take up half a pixel and have 
+only half a pixel spacing in between them.
 
 Unicode characters taken from https://en.m.wikipedia.org/wiki/List_of_Unicode_characters
 Unicode categories are ordered based on this: https://en.wikipedia.org/wiki/Unicode_block
@@ -3992,49 +3994,28 @@ PIXEL_WIDTHS = {
     ########################### NO CHARACTER IS IN MINECRAFT YET BEYOND HERE ###########################
     ####################################################################################################
 
-    # TODO: Linear B Syllabary
-
-    # TODO: Linear B Ideograms
-
-    # TODO: Aegean Numbers
-
-    # TODO: Ancient Greek Numbers
-
-    # TODO: Ancient Symbols
-
-    # TODO: Phaistos Disc
-
-    # TODO: Lycian
-
-    # TODO: Carian
-
-    # TODO: Coptic Epact Numbers
-
-    # TODO: Old Italic
-
-    # TODO: Gothic
-
-    # TODO: Old Permic
-
-    # TODO: Ugaritic
-
-    # TODO: Old Persian
-
-    # TODO: Deseret
-
-    # TODO: Shavian
-
-    # TODO: Osmanya
-
-    # TODO: Osage
-
-    # TODO: Elbasan
-
-    # TODO: Caucasian Albanian
-
-    # TODO: Vithkuqi
-
-    # TODO: Linear A
+    # Linear B Syllabary
+    # Linear B Ideograms
+    # Aegean Numbers
+    # Ancient Greek Numbers
+    # Ancient Symbols
+    # Phaistos Disc
+    # Lycian
+    # Carian
+    # Coptic Epact Numbers
+    # Old Italic
+    # Gothic
+    # Old Permic
+    # Ugaritic
+    # Old Persian
+    # Deseret
+    # Shavian
+    # Osmanya
+    # Osage
+    # Elbasan
+    # Caucasian Albanian
+    # Vithkuqi
+    # Linear A
 
     # Latin Extended-F
     '𐞀': 5, # *
@@ -4095,203 +4076,105 @@ PIXEL_WIDTHS = {
     '𐞹': 5, # *
     '𐞺': 5, # *
 
-    # TODO: Cypriot Syllabary
-
-    # TODO: Imperial Aramaic
-
-    # TODO: Palmyrene
-
-    # TODO: Nabataean
-
-    # TODO: Hatran
-
-    # TODO: Phoenician
-
-    # TODO: Lydian
-
-    # TODO: Meroitic Hieroglyphs
-
-    # TODO: Meroitic Cursive
-
-    # TODO: Kharoshthi
-
-    # TODO: Old South Arabian
-
-    # TODO: Old North Arabian
-
-    # TODO: Manichaean
-
-    # TODO: Avestan
-
-    # TODO: Inscriptional Parthian
-
-    # TODO: Inscriptional Pahlavi
-
-    # TODO: Psalter Pahlavi
-
-    # TODO: Old Turkic
-
-    # TODO: Old Hungarian
-
-    # TODO: Hanifi Rohingya
-
-    # TODO: Rumi Numeral Symbols
-
-    # TODO: Yezidi
-
-    # TODO: Arabic Extended-C
-
-    # TODO: Old Sogdian
-
-    # TODO: Sogdian
-
-    # TODO: Old Uyghur
-
-    # TODO: Chorasmian
-
-    # TODO: Elymaic
-
-    # TODO: Brahmi
-
-    # TODO: Kaithi
-
-    # TODO: Sora Sompeng
-
-    # TODO: Chakma
-
-    # TODO: Mahajani
-
-    # TODO: Sharada
-
-    # TODO: Sinhala Archaic Numbers
-
-    # TODO: Khojki
-
-    # TODO: Multani
-
-    # TODO: Khudawadi
-
-    # TODO: Grantha
-
-    # TODO: Newa
-
-    # TODO: Tirhuta
-
-    # TODO: Siddham
-
-    # TODO: Modi
-
-    # TODO: Mongolian Supplement
-
-    # TODO: Takri
-
-    # TODO: Ahom
-
-    # TODO: Dogra
-
-    # TODO: Warang Citi
-
-    # TODO: Dives Akuru
-
-    # TODO: Nandinagari
-
-    # TODO: Zanabazar Square
-
-    # TODO: Soyombo
-
-    # TODO: Unified Canadian Aboriginal Syllabics Extended-A
-
-    # TODO: Pau Cin Hau
-
-    # TODO: Devanagari Extended-A
-
-    # TODO: Bhaiksuki
-
-    # TODO: Marchen
-
-    # TODO: Masaram Gondi
-
-    # TODO: Gunjala Gondi
-
-    # TODO: Makasar
-
-    # TODO: Kawi
-
-    # TODO: Lisu Supplement
-
-    # TODO: Tamil Supplement
-
-    # TODO: Cuneiform
-
-    # TODO: Cuneiform Numbers and Punctuation
-
-    # TODO: Early Dynastic Cuneiform
-
-    # TODO: Cypro-Minoan
-
-    # TODO: Egyptian Hieroglyphs
-
-    # TODO: Egyptian Hieroglyph Format Controls
-
-    # TODO: Anatolian Hieroglyphs
-
-    # TODO: Bamum Supplement
-
-    # TODO: Mro
-
-    # TODO: Tangsa
-
-    # TODO: Bassa Vah
-
-    # TODO: Pahawh Hmong
-
-    # TODO: Medefaidrin
-
-    # TODO: Miao
-
-    # TODO: Ideographic Symbols and Punctuation
-
-    # TODO: Tangut
-
-    # TODO: Tangut Components
-
-    # TODO: Khitan Small Script
-
-    # TODO: Tangut Supplement
-
-    # TODO: Kana Extended-B
-
-    # TODO: Kana Supplement
-
-    # TODO: Kana Extended-A
-
-    # TODO: Small Kana Extension
-
-    # TODO: Nushu
-
-    # TODO: Duployan
-
-    # TODO: Shorthand Format Controls
-
-    # TODO: Znamenny Musical Notation
-
-    # TODO: Byzantine Musical Symbols
-
-    # TODO: Musical Symbols
-
-    # TODO: Ancient Greek Musical Notation
-
-    # TODO: Kaktovik Numerals
-
-    # TODO: Mayan Numerals
-
-    # TODO: Tai Xuan Jing Symbols
-
-    # TODO: Counting Rod Numerals
-
-    # TODO: Mathematical Alphanumeric Symbols
-
-    # TODO: Sutton SignWriting
+    # Cypriot Syllabary
+    # Imperial Aramaic
+    # Palmyrene
+    # Nabataean
+    # Hatran
+    # Phoenician
+    # Lydian
+    # Meroitic Hieroglyphs
+    # Meroitic Cursive
+    # Kharoshthi
+    # Old South Arabian
+    # Old North Arabian
+    # Manichaean
+    # Avestan
+    # Inscriptional Parthian
+    # Inscriptional Pahlavi
+    # Psalter Pahlavi
+    # Old Turkic
+    # Old Hungarian
+    # Hanifi Rohingya
+    # Rumi Numeral Symbols
+    # Yezidi
+    # Arabic Extended-C
+    # Old Sogdian
+    # Sogdian
+    # Old Uyghur
+    # Chorasmian
+    # Elymaic
+    # Brahmi
+    # Kaithi
+    # Sora Sompeng
+    # Chakma
+    # Mahajani
+    # Sharada
+    # Sinhala Archaic Numbers
+    # Khojki
+    # Multani
+    # Khudawadi
+    # Grantha
+    # Newa
+    # Tirhuta
+    # Siddham
+    # Modi
+    # Mongolian Supplement
+    # Takri
+    # Ahom
+    # Dogra
+    # Warang Citi
+    # Dives Akuru
+    # Nandinagari
+    # Zanabazar Square
+    # Soyombo
+    # Unified Canadian Aboriginal Syllabics Extended-A
+    # Pau Cin Hau
+    # Devanagari Extended-A
+    # Bhaiksuki
+    # Marchen
+    # Masaram Gondi
+    # Gunjala Gondi
+    # Makasar
+    # Kawi
+    # Lisu Supplement
+    # Tamil Supplement
+    # Cuneiform
+    # Cuneiform Numbers and Punctuation
+    # Early Dynastic Cuneiform
+    # Cypro-Minoan
+    # Egyptian Hieroglyphs
+    # Egyptian Hieroglyph Format Controls
+    # Anatolian Hieroglyphs
+    # Bamum Supplement
+    # Mro
+    # Tangsa
+    # Bassa Vah
+    # Pahawh Hmong
+    # Medefaidrin
+    # Miao
+    # Ideographic Symbols and Punctuation
+    # Tangut
+    # Tangut Components
+    # Khitan Small Script
+    # Tangut Supplement
+    # Kana Extended-B
+    # Kana Supplement
+    # Kana Extended-A
+    # Small Kana Extension
+    # Nushu
+    # Duployan
+    # Shorthand Format Controls
+    # Znamenny Musical Notation
+    # Byzantine Musical Symbols
+    # Musical Symbols
+    # Ancient Greek Musical Notation
+    # Kaktovik Numerals
+    # Mayan Numerals
+    # Tai Xuan Jing Symbols
+    # Counting Rod Numerals
+    # Mathematical Alphanumeric Symbols
+    # Sutton SignWriting
 
     # Latin Extended-G
     '𝼀': 5, # *
@@ -4332,7 +4215,7 @@ PIXEL_WIDTHS = {
     '𝼩': 5, # *
     '𝼪': 5, # *
 
-    # TODO: Glagolitic Supplement
+    # Glagolitic Supplement
 
     # Cyrillic Extended-D
     '𞀰': 5, # *
@@ -4399,79 +4282,42 @@ PIXEL_WIDTHS = {
     '𞁭': 5, # *
     '𞂏': 5, # *
 
-    # TODO: Nyiakeng Puachue Hmong
-
-    # TODO: Toto
-
-    # TODO: Wancho
-
-    # TODO: Nag Mundari
-
-    # TODO: Ethiopic Extended-B
-
-    # TODO: Mende Kikakui
-
-    # TODO: Adlam
-
-    # TODO: Indic Siyaq Numbers
-
-    # TODO: Ottoman Siyaq Numbers
-
-    # TODO: Arabic Mathematical Alphabetic Symbols
-
-    # TODO: Mahjong Tiles
-
-    # TODO: Domino Tiles
-
-    # TODO: Playing Cards
-
-    # TODO: Enclosed Alphanumeric Supplement
-
-    # TODO: Enclosed Ideographic Supplement
-
-    # TODO: Miscellaneous Symbols and Pictographs
-
-    # TODO: Emoticons
-
-    # TODO: Ornamental Dingbats
-
-    # TODO: Transport and Map Symbols
-
-    # TODO: Alchemical Symbols
-
-    # TODO: Geometric Shapes Extended
-
-    # TODO: Supplemental Arrows-C
-
-    # TODO: Supplemental Symbols and Pictographs
-
-    # TODO: Chess Symbols
-
-    # TODO: Symbols and Pictographs Extended-A
-
-    # TODO: Symbols for Legacy Computing
-
-    # TODO: CJK Unified Ideographs Extension B
-
-    # TODO: CJK Unified Ideographs Extension C
-
-    # TODO: CJK Unified Ideographs Extension D
-
-    # TODO: CJK Unified Ideographs Extension E
-
-    # TODO: CJK Unified Ideographs Extension F
-
-    # TODO: CJK Compatibility Ideographs Supplement
-
-    # TODO: CJK Unified Ideographs Extension G
-
-    # TODO: CJK Unified Ideographs Extension H
-
-    # TODO: Tags
-
-    # TODO: Variation Selectors Supplement
-
-    # TODO: Supplementary Private Use Area-A
-
-    # TODO: Supplementary Private Use Area-B
+    # Nyiakeng Puachue Hmong
+    # Toto
+    # Wancho
+    # Nag Mundari
+    # Ethiopic Extended-B
+    # Mende Kikakui
+    # Adlam
+    # Indic Siyaq Numbers
+    # Ottoman Siyaq Numbers
+    # Arabic Mathematical Alphabetic Symbols
+    # Mahjong Tiles
+    # Domino Tiles
+    # Playing Cards
+    # Enclosed Alphanumeric Supplement
+    # Enclosed Ideographic Supplement
+    # Miscellaneous Symbols and Pictographs
+    # Emoticons
+    # Ornamental Dingbats
+    # Transport and Map Symbols
+    # Alchemical Symbols
+    # Geometric Shapes Extended
+    # Supplemental Arrows-C
+    # Supplemental Symbols and Pictographs
+    # Chess Symbols
+    # Symbols and Pictographs Extended-A
+    # Symbols for Legacy Computing
+    # CJK Unified Ideographs Extension B
+    # CJK Unified Ideographs Extension C
+    # CJK Unified Ideographs Extension D
+    # CJK Unified Ideographs Extension E
+    # CJK Unified Ideographs Extension F
+    # CJK Compatibility Ideographs Supplement
+    # CJK Unified Ideographs Extension G
+    # CJK Unified Ideographs Extension H
+    # Tags
+    # Variation Selectors Supplement
+    # Supplementary Private Use Area-A
+    # Supplementary Private Use Area-B
 }

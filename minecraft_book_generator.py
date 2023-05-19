@@ -44,7 +44,9 @@ while i < len(words):
     curr_word_num_pixels = 0
     new_word = ""
     for character in words[i]:
-        curr_word_num_pixels += PIXEL_WIDTHS[character] + 1 # there is 1 pixel spacing between every character
+        # if a character isn't in the dictionary, assume a pixel spacing of 9 (the max potential spacing of a character)
+        # + 1 because there is a 1 character spacing between characters (with a few but handleable exceptions)
+        curr_word_num_pixels += PIXEL_WIDTHS.get(character, 9) + 1
 
         # if the character is a \, ", ', or \n, escape it for command formatting
         if character == "\\":
@@ -82,11 +84,11 @@ while i < len(words):
                 if words[i][j] == '\\' or words[i][j] == '\"' or words[i][j] == '\'':
                     num_escape_characters += 1
 
-                curr_num_pixels_in_word += PIXEL_WIDTHS[words[i][j]] + 1
+                curr_num_pixels_in_word += PIXEL_WIDTHS.get(words[i][j], 9) + 1
                 if curr_num_pixels_in_word > BOOK_WIDTH:
                     curr_line += 1
-                    potential_num_pixels -= (curr_num_pixels_in_word - PIXEL_WIDTHS[words[i][j]] - 1)
-                    curr_num_pixels_in_word = PIXEL_WIDTHS[words[i][j]] + 1
+                    potential_num_pixels -= (curr_num_pixels_in_word - PIXEL_WIDTHS.get(words[i][j], 9) - 1)
+                    curr_num_pixels_in_word = PIXEL_WIDTHS.get(words[i][j], 9) + 1
 
                 # if the word goes over to the next page, break to save processing time
                 if curr_line > BOOK_HEIGHT:
