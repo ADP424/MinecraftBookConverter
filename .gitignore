@@ -1,3 +1,4 @@
 *.txt
 *.mcfunction
 test.py
+/__pycache__
