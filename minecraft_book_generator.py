@@ -20,34 +20,37 @@ BOOK_WIDTH = 114
 # every Minecraft book page has a height of 14 lines
 BOOK_HEIGHT = 14
 
+# extract every space-separated word from a file given by the user
 words = []
 filename = input("What is the full name of the file containing your text?: ")
 with open(filename, 'r', encoding='utf-8') as file:
-    # add a space after every newline, then split by spaces
-    words = file.read().replace('\n', '\n ').split(' ')
 
+    # add a space before and after every newline, then split by spaces
+    words = file.read().replace('\n', ' \n ').split(' ')
+
+# get the title and author of the book from the user
 title = input("What is the title of the book?: ").replace('\"', '\\\"').strip()
-
 author = input("What is the author of the book?: ").replace('\"', '\\\"').strip()
-
-lore = input("What is the description of the book?: ").replace('\"', '\\\"').strip()
 
 command = "give @p written_book{pages:['{\"text\":\""
 
-curr_page = 1 # what number page of the current book the program is on
 curr_line = 1 # what number line of the current page the program is on
 curr_num_pixels = 0 # how many pixels on the current line the program is on
 
-i = 0
-last_word_ended_with_newline = False
-while i < len(words):
+# add every word to the command string
+for i in range(len(words)):
+
     curr_word_num_pixels = 0
     new_word = ""
+
+    # find the total pixel length of the word and generate the word to be added to the command string
     for character in words[i]:
+
         # if a character isn't in the dictionary, assume a pixel spacing of 9 (the max potential spacing of a character)
-        # if the default is used, print that the character wasn't recognized
-        # + 1 because there is a 1 character spacing between characters (with a few but handleable exceptions)
+        # + 1 pixel because there is a 1 character spacing between characters (with a few but handleable exceptions)
         curr_word_num_pixels += PIXEL_WIDTHS.get(character, 9) + 1
+
+        # if the character isn't in the dictionary, print which character wasn't recognized
         if character not in PIXEL_WIDTHS:
             print("Character currently unrecognized: " + character + ". Using default pixel width 9.")
 
@@ -63,76 +66,84 @@ while i < len(words):
         else:
             new_word += character
 
-    # if the word was just made up of spaces, skip
-    if len(new_word) == 0:
-        i += 1
-        continue
+    # if the addition of this word would make the line too long
+    if curr_num_pixels + curr_word_num_pixels > BOOK_WIDTH:
 
+        # if the word by itself is longer than a line, add it to the page piecemeal
+        if curr_word_num_pixels > BOOK_WIDTH:
+
+            # continue until every character from the word has been added
+            while len(new_word) > 0:
+
+                # if the next character will push the word onto the next line, go to the next line
+                if curr_num_pixels + PIXEL_WIDTHS.get(new_word[0], 9) + 1 > BOOK_WIDTH:
+
+                    curr_line += 1
+                    curr_num_pixels = 0
+
+                    # if the current line is off the page, go to the next page
+                    if curr_line > BOOK_HEIGHT:
+
+                        command += "\"}','{\"text\":\""
+                        curr_line = 1
+
+                # if the character is a slash, then it is the start of an escape sequence
+                if new_word[0] == '\\':
+
+                    # count the character after the slash but not the slash itself, then skip both
+                    curr_num_pixels += PIXEL_WIDTHS.get(new_word[1], 9) + 1
+                    command += new_word[0:2]
+                    new_word = new_word[2:]
+
+                else:
+
+                    # add the first character from the remaining word to the command
+                    curr_num_pixels += PIXEL_WIDTHS.get(new_word[0], 9) + 1
+                    command += new_word[0]
+
+                    # remove the first character from the word
+                    new_word = new_word[1:]
+
+        # go to the next line
+        curr_line += 1
+        curr_num_pixels = 0
+
+    # if the current word is a newline
+    if new_word == "\\\\n":
+
+        # if the current line is the last line of the page,
+        if curr_line == BOOK_HEIGHT:
+
+            # go the next page and don't write the newline
+            command += "\"}','{\"text\":\""
+            curr_line = 1
+            continue
+        
+        else:
+
+            # go to the next line
+            curr_line += 1
+        
+        curr_num_pixels = 0
+
+    # if the current line is off the page,
+    if curr_line > BOOK_HEIGHT:
+
+        # go the next page
+        command += "\"}','{\"text\":\""
+        curr_line = 1
+        curr_num_pixels = 0
+        
+    # add the current word to the page
+    command += new_word
     curr_num_pixels += curr_word_num_pixels
 
-    # if the number of pixels is greater than the limit for a single line or there is a newline
-    if curr_num_pixels > BOOK_WIDTH or last_word_ended_with_newline:
-        last_word_ended_with_newline = False # reset this
+    # if the word isn't made up of whitespace, add a space at the end of it
+    if len(new_word.strip()) > 0:
+        command += ' '
+        curr_num_pixels += PIXEL_WIDTHS[' '] + 1
 
-        # increment the current line and set the number of pixels at the start of that line equal to its length
-        curr_line += 1
-        potential_num_pixels = curr_word_num_pixels
-
-        num_escape_characters = 0 # keep track of the number of characters that need escaping with the backslash in the word
-        # in the case that the word is longer than an entire line, continue incrementing lines for its whole length
-        if curr_word_num_pixels > BOOK_WIDTH:
-            curr_num_pixels_in_word = 0
-            j = 0
-            while j < len(words[i]):
-                if words[i][j] == '\\' or words[i][j] == '\"' or words[i][j] == '\'':
-                    num_escape_characters += 1
-
-                curr_num_pixels_in_word += PIXEL_WIDTHS.get(words[i][j], 9) + 1
-                if curr_num_pixels_in_word > BOOK_WIDTH:
-                    curr_line += 1
-                    potential_num_pixels -= (curr_num_pixels_in_word - PIXEL_WIDTHS.get(words[i][j], 9) - 1)
-                    curr_num_pixels_in_word = PIXEL_WIDTHS.get(words[i][j], 9) + 1
-
-                # if the word goes over to the next page, break to save processing time
-                if curr_line > BOOK_HEIGHT:
-                    break
-
-                j += 1
-
-                # if this word takes up more than the rest of the page, write as much of it as will fit, and take that bit off
-            if curr_line > BOOK_HEIGHT:
-                # new_word is num_escape_characters longer than words[i] up until j
-                command += new_word[:j + num_escape_characters] # don't include the current character, since that pushed the word onto the next page
-                command += "\"}','{\"text\":\""
-                words[i] = words[i][j:]
-                curr_page += 1
-                curr_line = 1
-                curr_num_pixels = 0
-                continue
-
-        # if the word pushes the book to the next page, don't add the next word, don't
-        # increment to the next word, and don't reset the number of pixels
-        if curr_line > BOOK_HEIGHT:
-            command += "\"}','{\"text\":\""
-            curr_page += 1
-            curr_line = 1
-            curr_num_pixels = 0
-            continue
-
-        # only set the curr_num_pixels to the potential if the book isn't going to the next page
-        curr_num_pixels = potential_num_pixels
-    
-    # add a space at the end of the word
-    new_word += ' '
-    curr_num_pixels += PIXEL_WIDTHS[' '] + 1
-    command += new_word
-    i += 1
-
-    # whether there is a newline only matters if the book isn't going to the next page
-    if new_word[-4:-1] == '\\\\n':
-        last_word_ended_with_newline = True
-
-# end the current command and write it to the file
-command += "\"}'],title:\"" + title + "\",author:\"" + author + "\",display:{Lore:[\"" + lore + "\"]}}"
+# end the command and write it to the file
+command += "\"}'],title:\"" + title + "\",author:\"" + author + "\"}"
 with open('makebook.mcfunction', 'w', encoding='utf-8') as file:
     file.write(command)
