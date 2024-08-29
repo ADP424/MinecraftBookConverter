@@ -7,7 +7,7 @@ The output file can be placed inside the 'functions' folder of any data pack, or
 it can be pasted right into a command block if it is fewer than 32,500 characters.
 
 Updated as of Unicode version 15.0
-Updated as of Minecraft version 1.19.4
+Updated as of Minecraft version 1.21.1
 
 Author: Aidan Dalgarno-Platt
 """
@@ -32,7 +32,7 @@ with open(filename, 'r', encoding='utf-8') as file:
 title = input("What is the title of the book?: ").replace('\"', '\\\"').strip()
 author = input("What is the author of the book?: ").replace('\"', '\\\"').strip()
 
-command = "give @p written_book{pages:['{\"text\":\""
+command = "give @p written_book[written_book_content={pages:['[[\""
 
 curr_line = 1 # what number line of the current page the program is on
 curr_num_pixels = 0 # how many pixels on the current line the program is on
@@ -84,7 +84,7 @@ for i in range(len(words)):
                     # if the current line is off the page, go to the next page
                     if curr_line > BOOK_HEIGHT:
 
-                        command += "\"}','{\"text\":\""
+                        command += "\"]]','[[\""
                         curr_line = 1
 
                 # if the character is a slash, then it is the start of an escape sequence
@@ -111,11 +111,11 @@ for i in range(len(words)):
     # if the current word is a newline
     if new_word == "\\\\n":
 
-        # if the current line is the last line of the page,
+        # if the current line is the last line of the page
         if curr_line == BOOK_HEIGHT:
 
             # go the next page and don't write the newline
-            command += "\"}','{\"text\":\""
+            command += "\"]]','[[\""
             curr_line = 1
             continue
         
@@ -130,7 +130,7 @@ for i in range(len(words)):
     if curr_line > BOOK_HEIGHT:
 
         # go the next page
-        command += "\"}','{\"text\":\""
+        command += "\"]]','[[\""
         curr_line = 1
         curr_num_pixels = 0
         
@@ -144,6 +144,6 @@ for i in range(len(words)):
         curr_num_pixels += PIXEL_WIDTHS[' '] + 1
 
 # end the command and write it to the file
-command += "\"}'],title:\"" + title + "\",author:\"" + author + "\"}"
+command += "\"]]'],title:\"" + title + "\",author:\"" + author + "\"}]"
 with open('makebook.mcfunction', 'w', encoding='utf-8') as file:
     file.write(command)
