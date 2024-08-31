@@ -2,3 +2,5 @@
 *.mcfunction
 test.py
 /__pycache__
+
+!requirements.txt
