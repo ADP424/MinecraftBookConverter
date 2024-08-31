@@ -12,18 +12,42 @@ Updated as of Minecraft version 1.21.1
 Author: Aidan Dalgarno-Platt
 """
 
+from packaging.version import Version
+
 from pixel_widths import PIXEL_WIDTHS
+from PARAMETERS import (
+    TEXT_FILE, 
+    OUTPUT_FILE,
+    MC_VERSION
+)
+from CONSTANTS import ( 
+    BOOK_WIDTH, 
+    BOOK_HEIGHT,
+    COMMAND_START,
+    COMMAND_NEW_PAGE,
+    COMMAND_END
+)
 
-# every Minecraft book page has a width of 114 pixels
-BOOK_WIDTH = 114
+def get_command_by_version(command_dict: dict) -> str:
+    """
+    Get the correct syntax for the Minecraft command depending on the Minecraft version.
 
-# every Minecraft book page has a height of 14 lines
-BOOK_HEIGHT = 14
+    Parameters
+    ----------
+    command_dict: {COMMAND_START, COMMAND_NEW_PAGE, COMMAND_END}
+        The dictionary containing the command portion corresponding to a specific Minecraft version.
+
+    Returns
+    -------
+    str
+        The correct command portion corresponding to `MC_VERSION`.
+    """
+
+    return command_dict[max(([version for version in command_dict if Version(version) <= Version(MC_VERSION)]))]
 
 # extract every space-separated word from a file given by the user
 words = []
-filename = input("What is the full name of the file containing your text?: ")
-with open(filename, 'r', encoding='utf-8') as file:
+with open(TEXT_FILE, 'r', encoding='utf-8') as file:
 
     # add a space before and after every newline, then split by spaces
     words = file.read().replace('\n', ' \n ').split(' ')
@@ -32,7 +56,7 @@ with open(filename, 'r', encoding='utf-8') as file:
 title = input("What is the title of the book?: ").replace('\"', '\\\"').strip()
 author = input("What is the author of the book?: ").replace('\"', '\\\"').strip()
 
-command = "give @p written_book[written_book_content={pages:['[[\""
+command = get_command_by_version(COMMAND_START)
 
 curr_line = 1 # what number line of the current page the program is on
 curr_num_pixels = 0 # how many pixels on the current line the program is on
@@ -84,7 +108,7 @@ for i in range(len(words)):
                     # if the current line is off the page, go to the next page
                     if curr_line > BOOK_HEIGHT:
 
-                        command += "\"]]','[[\""
+                        command += get_command_by_version(COMMAND_NEW_PAGE)
                         curr_line = 1
 
                 # if the character is a slash, then it is the start of an escape sequence
@@ -115,7 +139,7 @@ for i in range(len(words)):
         if curr_line == BOOK_HEIGHT:
 
             # go the next page and don't write the newline
-            command += "\"]]','[[\""
+            command += get_command_by_version(COMMAND_NEW_PAGE)
             curr_line = 1
             continue
         
@@ -130,7 +154,7 @@ for i in range(len(words)):
     if curr_line > BOOK_HEIGHT:
 
         # go the next page
-        command += "\"]]','[[\""
+        command += get_command_by_version(COMMAND_NEW_PAGE)
         curr_line = 1
         curr_num_pixels = 0
         
@@ -144,6 +168,6 @@ for i in range(len(words)):
         curr_num_pixels += PIXEL_WIDTHS[' '] + 1
 
 # end the command and write it to the file
-command += "\"]]'],title:\"" + title + "\",author:\"" + author + "\"}]"
-with open('makebook.mcfunction', 'w', encoding='utf-8') as file:
+command += COMMAND_END
+with open(get_command_by_version(OUTPUT_FILE), 'w', encoding='utf-8') as file:
     file.write(command)
