@@ -5,10 +5,10 @@ TEXT_FILE = "text.txt"
 OUTPUT_FILE = "makebook.mcfunction"
 
 # the version of Minecraft you want your syntax to be from (in the form 1.x.x)
-MC_VERSION = "1.21.1"
+MC_VERSION = "1.21.5"
 
 # the title you want the book to have
-BOOK_TITLE = "The Lato Moment"
+BOOK_TITLE = "Questions"
 
 # the name of the author you want on the book
-BOOK_AUTHOR = "Bono Dale"
+BOOK_AUTHOR = "Mario"

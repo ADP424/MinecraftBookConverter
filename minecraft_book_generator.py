@@ -25,7 +25,9 @@ from CONSTANTS import (
     BOOK_HEIGHT,
     COMMAND_START,
     COMMAND_NEW_PAGE,
-    COMMAND_END
+    COMMAND_END,
+    ESCAPE_CHARS,
+    PAGE_END
 )
 
 def get_command_by_version(command_dict: dict) -> str:
@@ -43,7 +45,12 @@ def get_command_by_version(command_dict: dict) -> str:
         The correct command portion corresponding to `MC_VERSION`.
     """
 
-    return command_dict[max(([version for version in command_dict if Version(version) <= Version(MC_VERSION)]))]
+    return command_dict[
+        max(
+            ([version for version in command_dict if Version(version) <= Version(MC_VERSION)]), 
+            key=lambda x: Version(x)
+        )
+    ]
 
 # extract every space-separated word from a file given by the user
 words = []
@@ -51,10 +58,6 @@ with open(TEXT_FILE, 'r', encoding='utf-8') as file:
 
     # add a space before and after every newline, then split by spaces
     words = file.read().replace('\n', ' \n ').split(' ')
-
-# get the title and author of the book from the user
-title = input("What is the title of the book?: ").replace('\"', '\\\"').strip()
-author = input("What is the author of the book?: ").replace('\"', '\\\"').strip()
 
 command = get_command_by_version(COMMAND_START)
 
@@ -70,6 +73,10 @@ for i in range(len(words)):
     # find the total pixel length of the word and generate the word to be added to the command string
     for character in words[i]:
 
+        # if it's the very start of a new page, don't write any newlines
+        if curr_line == 1 and curr_num_pixels == 0 and character == '\n':
+            continue
+
         # if a character isn't in the dictionary, assume a pixel spacing of 9 (the max potential spacing of a character)
         # + 1 pixel because there is a 1 character spacing between characters (with a few but handleable exceptions)
         curr_word_num_pixels += PIXEL_WIDTHS.get(character, 9) + 1
@@ -80,13 +87,13 @@ for i in range(len(words)):
 
         # if the character is a \, ", ', or \n, escape it for command formatting
         if character == "\\":
-            new_word += "\\\\\\\\"
+            new_word += f"{get_command_by_version(ESCAPE_CHARS)}{get_command_by_version(ESCAPE_CHARS)}"
         elif character == '\"':
-            new_word += "\\\\\""
+            new_word += f"{get_command_by_version(ESCAPE_CHARS)}\""
         elif character == '\'':
             new_word += "\\\'"
         elif character == '\n':
-            new_word += "\\\\n"
+            new_word += f"{get_command_by_version(ESCAPE_CHARS)}n"
         else:
             new_word += character
 
@@ -133,7 +140,7 @@ for i in range(len(words)):
         curr_num_pixels = 0
 
     # if the current word is a newline
-    if new_word == "\\\\n":
+    if new_word == f"{get_command_by_version(ESCAPE_CHARS)}n":
 
         # if the current line is the last line of the page
         if curr_line == BOOK_HEIGHT:
@@ -151,7 +158,7 @@ for i in range(len(words)):
         curr_num_pixels = 0
 
     # if the current line is off the page,
-    if curr_line > BOOK_HEIGHT:
+    if curr_line > BOOK_HEIGHT or new_word == PAGE_END:
 
         # go the next page
         command += get_command_by_version(COMMAND_NEW_PAGE)
@@ -159,15 +166,16 @@ for i in range(len(words)):
         curr_num_pixels = 0
         
     # add the current word to the page
-    command += new_word
-    curr_num_pixels += curr_word_num_pixels
+    if new_word != PAGE_END:
+        command += new_word
+        curr_num_pixels += curr_word_num_pixels
 
-    # if the word isn't made up of whitespace, add a space at the end of it
-    if len(new_word.strip()) > 0:
-        command += ' '
-        curr_num_pixels += PIXEL_WIDTHS[' '] + 1
+        # if the word isn't made up of whitespace, add a space at the end of it
+        if len(new_word.strip()) > 0:
+            command += ' '
+            curr_num_pixels += PIXEL_WIDTHS[' '] + 1
 
 # end the command and write it to the file
-command += COMMAND_END
-with open(get_command_by_version(OUTPUT_FILE), 'w', encoding='utf-8') as file:
+command += get_command_by_version(COMMAND_END)
+with open(OUTPUT_FILE, 'w', encoding='utf-8') as file:
     file.write(command)
