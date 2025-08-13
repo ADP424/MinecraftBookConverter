@@ -288,7 +288,7 @@ if __name__ == "__main__":
         input_file = DEFAULT_INPUT_FILE
     else:
         input_file = args.input_file
-    if args.input_file is None:
+    if args.output_file is None:
         output_file = DEFAULT_OUTPUT_FILE
     else:
         output_file = args.output_file
